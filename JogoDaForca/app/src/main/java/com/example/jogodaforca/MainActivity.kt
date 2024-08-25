@@ -1,95 +1,138 @@
 package com.example.jogodaforca
 
+import android.content.Intent
+import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.jogodaforca.databinding.ActivityMainBinding
 
-// Definição da classe MainActivity que herda de AppCompatActivity
 class MainActivity : AppCompatActivity() {
-    // Variável de ligação para acessar os elementos da interface do usuário
+    // Variável para acessar os elementos da interface do usuário
     private lateinit var binding: ActivityMainBinding
+    // Variável para gerenciar a reprodução de som
+    private lateinit var mediaPlayer: MediaPlayer
 
-    // Lista de palavras possíveis para o jogo
-    private val palavras = listOf("kotlin", "android", "desenvolvedor")
+    // Categorias de palavras, cada uma mapeando para uma lista de palavras
+    private val categorias = mapOf(
+        "Tecnologia" to listOf("kotlin", "android", "desenvolvedor"),
+        "Animais" to listOf("gato", "cachorro", "elefante"),
+        "Cores" to listOf("vermelho", "azul", "amarelo")
+    )
 
-    // Seleciona uma palavra aleatória da lista e a converte para maiúsculas
-    private val palavraSelecionada = palavras.random().uppercase()
-
-    // Cria um array de caracteres para representar a palavra oculta, inicialmente preenchida com '_'
-    private val palavraOculta = CharArray(palavraSelecionada.length) { '_' }
-
-    // Variável para contar o número de tentativas restantes
+    // Variáveis para armazenar a palavra selecionada, sua categoria, e a palavra oculta
+    private var palavraSelecionada: String = ""
+    private var categoriaSelecionada: String = ""
+    private var palavraOculta: CharArray = CharArray(0)
+    // Número de tentativas restantes
     private var tentativas = 6
-
-    // Lista para armazenar as letras que já foram adivinhadas
+    // Lista de letras já adivinhadas
     private val letrasAdivinhadas = mutableListOf<Char>()
 
-    /**
-     * Função onCreate, chamada quando a atividade é criada.
-     * @param savedInstanceState Instância salva do estado anterior da atividade (pode ser nulo).
-     * @return Unit (não retorna nenhum valor).
-     */
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         // Infla o layout usando o binding
         binding = ActivityMainBinding.inflate(layoutInflater)
-        super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        // Atualiza a tela inicial com os valores padrão
+        // Seleciona uma categoria e uma palavra aleatória dessa categoria
+        categoriaSelecionada = categorias.keys.random()
+        palavraSelecionada = categorias[categoriaSelecionada]!!.random().uppercase()
+        // Inicializa a palavra oculta com '_' para cada letra
+        palavraOculta = CharArray(palavraSelecionada.length) { '_' }
+
+        // Inicializa o MediaPlayer com o som de vitória
+        mediaPlayer = MediaPlayer.create(this, R.raw.victory_sound)
+
+        // Atualiza a interface inicial
         atualizarTela()
 
-        // Define o comportamento do botão de adivinhar quando é clicado
+        // Define o comportamento do botão de adivinhar
         binding.buttonAdivinhar.setOnClickListener {
-            // Obtém a entrada do usuário e a converte para maiúsculas
             val entrada = binding.editEntrada.text.toString().uppercase()
-            // Verifica se a entrada não está vazia
+
             if (entrada.isNotEmpty()) {
-                // Pega a primeira letra da entrada
                 val letra = entrada[0]
-                // Verifica se a letra ainda não foi adivinhada
-                if (!letrasAdivinhadas.contains(letra)) {
+
+                if (letrasAdivinhadas.contains(letra)) {
+                    // Exibe mensagem se a letra já foi utilizada
+                    binding.textStatus.text = "Letra '$letra' já foi utilizada!"
+                } else if (letra.isLetter()) {
                     // Adiciona a letra à lista de letras adivinhadas
                     letrasAdivinhadas.add(letra)
-                    // Verifica se a palavra selecionada contém a letra
+                    // Verifica se a letra está na palavra selecionada
                     if (palavraSelecionada.contains(letra)) {
-                        // Atualiza o array da palavra oculta com a letra correta nas posições certas
                         for (i in palavraSelecionada.indices) {
                             if (palavraSelecionada[i] == letra) {
                                 palavraOculta[i] = letra
                             }
                         }
                     } else {
-                        // Se a letra não estiver na palavra, decrementa o número de tentativas
+                        // Decrementa as tentativas se a letra não estiver na palavra
                         tentativas--
                     }
-                    // Limpa o campo de entrada
+                    // Limpa o campo de entrada e atualiza a interface
                     binding.editEntrada.text.clear()
-                    // Atualiza a tela com os novos valores
                     atualizarTela()
+                } else {
+                    // Exibe mensagem de erro se a entrada não for uma letra válida
+                    binding.textStatus.text = "Por favor, insira uma letra válida."
                 }
             }
         }
+
+        // Define o comportamento do botão de reiniciar
+        binding.buttonReiniciar.setOnClickListener {
+            reiniciarJogo()
+        }
+
+        // Define o comportamento do botão de voltar à tela inicial
+        binding.buttonVoltarInicio.setOnClickListener {
+            val intent = Intent(this, InicioActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
 
-    /**
-     * Função que atualiza a interface com a palavra oculta e o número de tentativas restantes.
-     * Não possui parâmetros de entrada.
-     * @return Unit (não retorna nenhum valor).
-     */
+    // Função para atualizar a interface do usuário com as informações mais recentes
     private fun atualizarTela() {
-        // Exibe a palavra oculta com as letras adivinhadas
+        // Exibe a palavra oculta e as letras adivinhadas
         binding.textOculto.text = palavraOculta.joinToString(" ")
-
+        // Exibe a categoria da palavra
+        binding.textCategoria.text = "Categoria: $categoriaSelecionada"
         // Exibe o número de tentativas restantes
-        binding.textTentativas.text = "Restam: $tentativas"
+        binding.textTentativas.text = "Tentativas restantes: $tentativas"
+        // Exibe as letras já utilizadas
+        binding.textLetrasUsadas.text = "Letras usadas: ${letrasAdivinhadas.joinToString(", ")}"
 
-        // Verifica se o jogador ganhou ou perdeu e atualiza o status
+        // Verifica se o jogador ganhou ou perdeu e atualiza a interface
         if (!palavraOculta.contains('_')) {
-            binding.textStatus.text = "Parabéns! $palavraSelecionada"
+            binding.textStatus.text = "Parabéns! Você acertou a palavra: $palavraSelecionada"
             binding.buttonAdivinhar.isEnabled = false
+            mediaPlayer.start() // Toca o som de vitória
         } else if (tentativas <= 0) {
-            binding.textStatus.text = "Perdeu! Era $palavraSelecionada"
+            binding.textStatus.text = "Você perdeu! A palavra era: $palavraSelecionada"
             binding.buttonAdivinhar.isEnabled = false
         }
+    }
+
+    // Função para reiniciar o jogo
+    private fun reiniciarJogo() {
+        // Seleciona uma nova palavra e categoria aleatória
+        categoriaSelecionada = categorias.keys.random()
+        palavraSelecionada = categorias[categoriaSelecionada]!!.random().uppercase()
+        palavraOculta = CharArray(palavraSelecionada.length) { '_' }
+        letrasAdivinhadas.clear()
+        tentativas = 6
+        binding.buttonAdivinhar.isEnabled = true
+        binding.textStatus.text = ""
+        mediaPlayer.stop()
+        mediaPlayer.prepare()
+        atualizarTela()
+    }
+
+    // Libera os recursos do MediaPlayer quando a atividade for destruída
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaPlayer.release()
     }
 }

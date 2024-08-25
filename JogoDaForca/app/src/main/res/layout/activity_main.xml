@@ -1,49 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    android:padding="16dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:background="#f0f0f0"
+    android:padding="20dp"
+    tools:context=".MainActivity">
 
     <TextView
         android:id="@+id/textTentativas"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Tentativas: 6"
-        android:textSize="20sp"/>
+        android:text="Tentativas restantes: 6"
+        android:textSize="24sp"
+        android:textColor="#333333"
+        android:layout_marginBottom="20dp"/>
+
+    <!-- Nova TextView para exibir a categoria da palavra -->
+    <TextView
+        android:id="@+id/textCategoria"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Categoria: "
+        android:textSize="22sp"
+        android:textColor="#666666"
+        android:layout_marginBottom="20dp"/>
 
     <TextView
         android:id="@+id/textOculto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="______"
-        android:textSize="30sp"
-        android:layout_marginTop="20dp"/>
+        android:text="__"
+        android:textSize="36sp"
+        android:textColor="#000000"
+        android:layout_marginBottom="20dp"/>
+
+    <TextView
+        android:id="@+id/textLetrasUsadas"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Letras usadas: "
+        android:textSize="20sp"
+        android:textColor="#666666"
+        android:layout_marginBottom="20dp"/>
 
     <EditText
+        android:id="@+id/editEntrada"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/editEntrada"
-        android:layout_marginTop="20dp"
         android:maxLength="1"
         android:inputType="text"
-        android:hint="Digite Uma Letra"/>
+        android:hint="Digite Uma Letra"
+        android:textSize="18sp"
+        android:layout_marginBottom="20dp"
+        android:background="@android:drawable/editbox_background"
+        android:padding="10dp"/>
 
     <Button
+        android:id="@+id/buttonAdivinhar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Adivinhar"
-        android:layout_marginTop="20dp"
-        android:id="@+id/buttonAdivinhar"/>
+        android:textSize="18sp"
+        android:layout_marginBottom="20dp"
+        android:paddingHorizontal="20dp"
+        android:background="@android:drawable/btn_default"/>
+
+    <Button
+        android:id="@+id/buttonReiniciar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reiniciar"
+        android:textSize="18sp"
+        android:paddingHorizontal="20dp"
+        android:background="@android:drawable/btn_default"/>
+
+    <Button
+        android:id="@+id/buttonVoltarInicio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Voltar ao Início"
+        android:textSize="18sp"
+        android:paddingHorizontal="20dp"
+        android:background="@android:drawable/btn_default"
+        android:layout_marginTop="20dp"/>
 
     <TextView
         android:id="@+id/textStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text=""
-        android:textSize="20sp"
+        android:textSize="22sp"
+        android:textColor="#FF0000"
         android:layout_marginTop="20dp"/>
 </LinearLayout>
